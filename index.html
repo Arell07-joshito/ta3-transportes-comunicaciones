@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TA3 · Gastos de los hogares en transportes y comunicaciones (ENAHO 2025)</title>
+  <meta name="description" content="Presentación interactiva del reporte: gastos de los hogares en transportes y comunicaciones, módulo 604, año 2025.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap">
+      <div class="logo">TA3 · Módulo 604</div>
+      <nav class="nav" id="nav">
+        <a href="#inicio">Inicio</a>
+        <a href="#base">Base de datos</a>
+        <a href="#resultados">Resultados</a>
+        <a href="#resumen">Resumen</a>
+        <a href="#conclusiones">Conclusiones</a>
+      </nav>
+      <button class="icon-btn" id="themeBtn" aria-label="Cambiar tema claro/oscuro" title="Tema claro/oscuro">🌓</button>
+    </div>
+  </header>
+
+  <section class="hero" id="inicio" style="padding-top:64px">
+    <div class="wrap">
+      <small>Reporte e informe · Google Colab + Python</small>
+      <h1>Gastos de los hogares en transportes y comunicaciones</h1>
+      <p>Explora de forma interactiva los resultados del módulo 604 de la encuesta de hogares 2025: qué productos usan los hogares, dónde compran, cuánto gastan y cómo cambia según la región.</p>
+      <div class="cta">
+        <a class="btn primary" href="#resultados">Ver resultados</a>
+        <a class="btn" href="#base">Conocer la base</a>
+        <a class="btn" id="repoLink" href="#" target="_blank" rel="noopener">Repositorio en GitHub</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="kpis" id="kpis"></div>
+  </div>
+
+  <main class="wrap">
+    <!-- BASE DE DATOS -->
+    <section id="base" class="fade">
+      <h2>1. Descripción de la base de datos</h2>
+      <p class="lead">SUMATORIA.csv reúne las respuestas del módulo 604 «Transportes y comunicaciones»; el cuestionario está en ENCUESTA.pdf. Cada hogar responde, para 12 productos o servicios, si los obtuvo o usó el mes anterior, cómo, dónde y por cuánto.</p>
+      <div class="grid2">
+        <div class="card">
+          <h3>Estructura</h3>
+          <p id="estructura"></p>
+          <span class="tag">Unidad: hogar × producto</span><span class="tag">Periodo: ene–dic 2025</span><span class="tag">Ponderado con FACTOR07</span>
+        </div>
+        <div class="card">
+          <h3>Calidad de los datos</h3>
+          <ul id="calidad" style="margin:0;padding-left:20px"></ul>
+        </div>
+      </div>
+      <div class="card" style="margin-top:18px">
+        <h3>Variables principales</h3>
+        <input class="searchbox" id="buscaVar" type="search" placeholder="Buscar variable o palabra (ej. monto, P604B, lugar)…" aria-label="Buscar variable">
+        <div class="tbl-wrap"><table id="tablaVars"><thead><tr><th>Variable</th><th>Descripción</th><th>Tipo</th></tr></thead><tbody></tbody></table></div>
+      </div>
+    </section>
+
+    <!-- RESULTADOS -->
+    <section id="resultados" class="fade">
+      <h2>2. Resultados interactivos</h2>
+      <p class="lead">Elige un ámbito geográfico: todos los gráficos se actualizan. Pasa el cursor sobre las barras para ver el detalle.</p>
+      <div class="filters">
+        <label for="selDom">Ámbito:</label>
+        <select id="selDom"></select>
+        <span style="color:var(--muted);font-size:.85rem" id="nota"></span>
+      </div>
+
+      <div class="card chart-card">
+        <div class="chart-head"><h3>2.1 ¿Qué productos y servicios usan los hogares?</h3>
+          <div class="chips" id="chipsOrden"><button class="chip on" data-v="valor">Mayor a menor</button><button class="chip" data-v="id">Orden del cuestionario</button></div></div>
+        <div class="chart" id="g1"></div>
+        <div class="insight" id="t1"></div>
+      </div>
+
+      <div class="card chart-card">
+        <div class="chart-head"><h3>2.2 ¿Dónde compran?</h3>
+          <div><label for="selItem" style="font-size:.9rem;font-weight:600">Producto: </label><select id="selItem"></select></div></div>
+        <div class="split"><div class="chart" id="g2"></div><div id="g2leg"></div></div>
+        <div class="insight" id="t2"></div>
+      </div>
+
+      <div class="card chart-card">
+        <div class="chart-head"><h3>2.3 ¿Cuánto gastan al mes? (hogares que compraron)</h3>
+          <div class="chips" id="chipsMed"><button class="chip on" data-v="ambas">Media y mediana</button><button class="chip" data-v="media">Solo media</button><button class="chip" data-v="mediana">Solo mediana</button></div></div>
+        <div class="chart" id="g3"></div>
+        <div class="legend"><span><i style="background:var(--brand)"></i>Media</span><span><i style="background:var(--accent)"></i>Mediana</span><span>Se omiten rubros con menos de 30 casos.</span></div>
+        <div class="insight" id="t3"></div>
+      </div>
+
+      <div class="card chart-card">
+        <div class="chart-head"><h3>2.4 Diferencias por dominio geográfico</h3>
+          <div class="chips" id="chipsDom"><button class="chip on" data-v="gastoMedio">Gasto medio por hogar</button><button class="chip" data-v="gastoMediano">Gasto mediano</button><button class="chip" data-v="pctConGasto">% hogares con gasto</button></div></div>
+        <div class="chart" id="g4"></div>
+        <div class="insight" id="t4"></div>
+      </div>
+
+      <div class="card chart-card">
+        <div class="chart-head"><h3>2.5 Evolución mensual en 2025</h3>
+          <div class="chips" id="chipsMes"><button class="chip on" data-v="gastoMedio">Gasto medio por hogar (S/)</button><button class="chip" data-v="pctGasto">% hogares con gasto</button></div></div>
+        <div class="chart" id="g5"></div>
+        <div class="insight" id="t5"></div>
+      </div>
+    </section>
+
+    <!-- RESUMEN -->
+    <section id="resumen" class="fade">
+      <h2>3. Resumen cuantitativo</h2>
+      <p class="lead">Haz clic en el encabezado de una columna para ordenar. La tabla respeta el ámbito elegido arriba.</p>
+      <div class="card"><div class="tbl-wrap"><table id="tablaRes"><thead><tr>
+        <th class="sortable" data-k="nombre">Producto/servicio ↕</th><th class="sortable num" data-k="pct">% hogares ↕</th>
+        <th class="sortable num" data-k="n">Casos con monto ↕</th><th class="sortable num" data-k="media">Media (S/) ↕</th><th class="sortable num" data-k="mediana">Mediana (S/) ↕</th>
+      </tr></thead><tbody></tbody></table></div>
+      <p style="color:var(--muted);font-size:.85rem;margin:10px 0 0">«–» indica menos de 30 casos con monto.</p></div>
+    </section>
+
+    <!-- CONCLUSIONES -->
+    <section id="conclusiones" class="fade">
+      <h2>4. Conclusiones</h2>
+      <div class="concl" id="concl"></div>
+      <p class="lead" style="margin-top:18px"><b>Limitaciones:</b> la información corresponde al mes anterior a la entrevista, los montos son nominales y los rubros de menores de 14 años y de comunicaciones tienen muy pocos casos.</p>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <b>TA3 · Gastos de los hogares en transportes y comunicaciones (módulo 604, 2025)</b><br>
+      Procesado en Google Colab con Python (pandas, matplotlib). Presentación web: HTML, CSS y JavaScript sin librerías externas.<br>
+      <a id="repoLink2" href="#" target="_blank" rel="noopener">Código en GitHub</a> ·
+      <a id="pagesLink" href="#" target="_blank" rel="noopener">Página publicada</a>
+    </div>
+  </footer>
+
+  <div id="tip" role="tooltip"></div>
+  <script src="datos.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
